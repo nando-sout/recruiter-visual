@@ -40,6 +40,7 @@ import {
   BarChart3,
   Banknote,
   BookOpen,
+  BriefcaseBusiness,
   CreditCard,
   FileText,
   Files,
@@ -115,6 +116,12 @@ const SidebarContent: MenuItem[] = [
   {
     heading: "Apps",
     items: [
+      {
+        id: uniqueId(),
+        name: "Minhas vagas",
+        icon: BriefcaseBusiness,
+        url: "/apps/vagas",
+      },
       {
         id: uniqueId(),
         name: "Notes",

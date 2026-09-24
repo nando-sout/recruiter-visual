@@ -1,0 +1,239 @@
+import { KeyboardEvent, useState } from "react";
+import { ArrowDown, ArrowUp, Flag, Plus, Trash2, TriangleAlert, Users } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from "src/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "src/components/ui/alert";
+import { Badge } from "src/components/ui/badge";
+import { Button } from "src/components/ui/button";
+import { FieldDescription, FieldError } from "src/components/ui/field";
+import { Input } from "src/components/ui/input";
+import { createEtapa, isEtapaFechamento, withExplicitOrder } from "src/lib/vagas";
+import { EtapaType } from "src/types/apps/vagas";
+
+interface EtapasEditorProps {
+  /** Etapas já ordenadas por `order` */
+  etapas: EtapaType[];
+  onChange: (etapas: EtapaType[]) => void;
+  error?: string;
+  showCandidates?: boolean;
+  disabled?: boolean;
+}
+
+const candidatesLabel = (count: number) => `${count} ${count === 1 ? "candidato" : "candidatos"}`;
+
+const EtapasEditor = ({
+  etapas,
+  onChange,
+  error,
+  showCandidates = false,
+  disabled = false,
+}: EtapasEditorProps) => {
+  const [newEtapaName, setNewEtapaName] = useState("");
+  // A etapa selecionada é mantida enquanto o diálogo fecha, para o conteúdo não trocar na animação.
+  const [etapaToDelete, setEtapaToDelete] = useState<EtapaType | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const openDeleteDialog = (etapa: EtapaType) => {
+    setEtapaToDelete(etapa);
+    setDeleteDialogOpen(true);
+  };
+
+  const renameEtapa = (id: string, name: string) =>
+    onChange(etapas.map((etapa) => (etapa.id === id ? { ...etapa, name } : etapa)));
+
+  const moveEtapa = (index: number, direction: -1 | 1) => {
+    const next = [...etapas];
+    [next[index], next[index + direction]] = [next[index + direction], next[index]];
+    onChange(withExplicitOrder(next));
+  };
+
+  const addEtapa = () => {
+    const name = newEtapaName.trim();
+    if (!name) return;
+    onChange([...etapas, createEtapa(name, etapas.length + 1)]);
+    setNewEtapaName("");
+  };
+
+  // Enter no campo adiciona a etapa em vez de enviar o formulário da vaga.
+  const handleNewEtapaKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addEtapa();
+    }
+  };
+
+  const confirmDelete = () => {
+    if (!etapaToDelete) return;
+    onChange(withExplicitOrder(etapas.filter((etapa) => etapa.id !== etapaToDelete.id)));
+    setDeleteDialogOpen(false);
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <ol className="flex flex-col gap-2">
+        {etapas.map((etapa, index) => {
+          const fechamento = isEtapaFechamento(etapa);
+          return (
+            <li
+              key={etapa.id}
+              className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-2 sm:flex-nowrap"
+            >
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold tabular-nums">
+                {etapa.order}
+              </span>
+              <Input
+                aria-label={`Nome da etapa ${etapa.order}`}
+                value={etapa.name}
+                onChange={(e) => renameEtapa(etapa.id, e.target.value)}
+                aria-invalid={Boolean(error) && !etapa.name.trim()}
+                disabled={disabled}
+                className="min-w-0 flex-1 basis-40"
+              />
+              <div className="ml-auto flex shrink-0 items-center gap-2">
+                {fechamento && (
+                  <Badge variant="outline">
+                    <Flag />
+                    Fechamento
+                  </Badge>
+                )}
+                {showCandidates && (
+                  <span className="flex items-center gap-1 text-xs whitespace-nowrap text-muted-foreground">
+                    <Users className="size-3.5" />
+                    {candidatesLabel(etapa.candidatesCount)}
+                  </span>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Mover "${etapa.name}" para cima`}
+                  disabled={disabled || index === 0}
+                  onClick={() => moveEtapa(index, -1)}
+                >
+                  <ArrowUp />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Mover "${etapa.name}" para baixo`}
+                  disabled={disabled || index === etapas.length - 1}
+                  onClick={() => moveEtapa(index, 1)}
+                >
+                  <ArrowDown />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={
+                    fechamento
+                      ? "A etapa de fechamento não pode ser excluída"
+                      : `Excluir "${etapa.name}"`
+                  }
+                  disabled={disabled || fechamento}
+                  onClick={() => openDeleteDialog(etapa)}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 />
+                </Button>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input
+          aria-label="Nome da nova etapa"
+          placeholder="Nome da nova etapa"
+          value={newEtapaName}
+          onChange={(e) => setNewEtapaName(e.target.value)}
+          onKeyDown={handleNewEtapaKeyDown}
+          disabled={disabled}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={addEtapa}
+          disabled={disabled || !newEtapaName.trim()}
+          className="sm:w-auto"
+        >
+          <Plus />
+          Adicionar etapa
+        </Button>
+      </div>
+
+      <FieldDescription>
+        A ordem das etapas define o funil e o Kanban da vaga. A etapa de fechamento pode ser
+        renomeada e reordenada, mas não pode ser excluída.
+      </FieldDescription>
+      {error && <FieldError>{error}</FieldError>}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          {etapaToDelete && etapaToDelete.candidatesCount > 0 ? (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogMedia className="bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <TriangleAlert />
+                </AlertDialogMedia>
+                <AlertDialogTitle>Existem candidatos nesta etapa</AlertDialogTitle>
+                <AlertDialogDescription>
+                  A etapa "{etapaToDelete.name}" possui{" "}
+                  {candidatesLabel(etapaToDelete.candidatesCount)}. Você quer movê-los para uma
+                  etapa anterior ou para uma etapa à frente?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <Alert>
+                <AlertDescription>
+                  A movimentação de candidatos ainda não está disponível. Por enquanto, etapas com
+                  candidatos não podem ser excluídas.
+                </AlertDescription>
+              </Alert>
+              <AlertDialogFooter className="sm:flex-col-reverse">
+                <AlertDialogCancel>Voltar</AlertDialogCancel>
+                <Button type="button" variant="outline" disabled>
+                  Mover para etapa anterior
+                </Button>
+                <Button type="button" variant="outline" disabled>
+                  Mover para etapa à frente
+                </Button>
+              </AlertDialogFooter>
+            </>
+          ) : (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Excluir etapa?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  A etapa "{etapaToDelete?.name}" será removida da vaga e as demais serão
+                  renumeradas.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={confirmDelete}
+                >
+                  Excluir etapa
+                </Button>
+              </AlertDialogFooter>
+            </>
+          )}
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default EtapasEditor;

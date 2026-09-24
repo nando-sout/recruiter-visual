@@ -24,6 +24,10 @@ const BlogTable = Loadable(lazy(() => import('../views/apps/blog/manage-blog')))
 
 const Notes = Loadable(lazy(() => import('../views/apps/notes')));
 
+const MinhasVagas = Loadable(lazy(() => import('../views/apps/vagas')));
+const NovaVaga = Loadable(lazy(() => import('../views/apps/vagas/create')));
+const VagaDetail = Loadable(lazy(() => import('../views/apps/vagas/detail')));
+
 const Tickets = Loadable(lazy(() => import('../views/apps/tickets')));
 const TicketCreate = Loadable(lazy(() => import('../views/apps/tickets/create')));
 
@@ -63,6 +67,10 @@ const Router = [
       { path: '/apps/blog/manage-blog', element: <BlogTable /> },
 
       { path: '/apps/notes', element: <Notes /> },
+
+      { path: '/apps/vagas', element: <MinhasVagas /> },
+      { path: '/apps/vagas/create', element: <NovaVaga /> },
+      { path: '/apps/vagas/:id', element: <VagaDetail /> },
 
       { path: '/apps/tickets', element: <Tickets /> },
       { path: '/apps/tickets/create', element: <TicketCreate /> },
