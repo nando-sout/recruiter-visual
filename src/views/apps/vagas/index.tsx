@@ -1,14 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 import { Link } from "react-router";
-import {
-  ArrowRight,
-  BriefcaseBusiness,
-  CalendarDays,
-  ListOrdered,
-  Plus,
-  Search,
-  Users,
-} from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, CalendarDays, Plus, Search } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "src/components/ui/alert";
 import { Badge } from "src/components/ui/badge";
 import { Button } from "src/components/ui/button";
@@ -30,11 +22,13 @@ import {
 import { Input } from "src/components/ui/input";
 import { Skeleton } from "src/components/ui/skeleton";
 import VagaStatusBadge from "src/components/apps/vagas/vaga-status-badge";
-import { VagasContext, VagasProvider } from "src/context/vagas-context";
-import { countCandidates, formatVagaDate } from "src/lib/vagas";
-import { VagaType } from "src/types/apps/vagas";
+import { MinhasVagasContext, MinhasVagasProvider } from "src/context/vagas-context";
+import { formatVagaDate } from "src/lib/vagas";
+import { VagaResponse } from "src/types/apps/vagas";
 
-const VagaCard = ({ vaga }: { vaga: VagaType }) => (
+// Contagens de candidatos e de etapas voltam ao card quando etapas e candidatos forem integrados:
+// GET /vagas não traz etapas.
+const VagaCard = ({ vaga }: { vaga: VagaResponse }) => (
   <Card className="h-full">
     <CardHeader>
       <div className="mb-1 flex flex-wrap items-center gap-2">
@@ -47,14 +41,6 @@ const VagaCard = ({ vaga }: { vaga: VagaType }) => (
       <CardDescription className="line-clamp-2">{vaga.description}</CardDescription>
     </CardHeader>
     <CardContent className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground">
-      <span className="flex items-center gap-1.5">
-        <Users className="size-4" />
-        {countCandidates(vaga.etapas)} candidatos
-      </span>
-      <span className="flex items-center gap-1.5">
-        <ListOrdered className="size-4" />
-        {vaga.etapas.length} etapas
-      </span>
       <span className="flex items-center gap-1.5">
         <CalendarDays className="size-4" />
         Criada em {formatVagaDate(vaga.createdAt)}
@@ -75,7 +61,7 @@ const VagaCard = ({ vaga }: { vaga: VagaType }) => (
 );
 
 const VagasList = () => {
-  const { vagas, loading, error } = useContext(VagasContext);
+  const { vagas, loading, error } = useContext(MinhasVagasContext);
   const [search, setSearch] = useState("");
 
   const filteredVagas = useMemo(() => {
@@ -113,7 +99,8 @@ const VagasList = () => {
           placeholder="Buscar por código da vaga"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-9 pl-8"
+          // O `!` é necessário: o px-2.5 de .cn-input vence o pl-* comum e o texto entra na lupa.
+          className="h-9 pl-9!"
         />
       </div>
 
@@ -143,7 +130,7 @@ const VagasList = () => {
 };
 
 const MinhasVagas = () => (
-  <VagasProvider>
+  <MinhasVagasProvider>
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
@@ -164,7 +151,7 @@ const MinhasVagas = () => (
 
       <VagasList />
     </div>
-  </VagasProvider>
+  </MinhasVagasProvider>
 );
 
 export default MinhasVagas;

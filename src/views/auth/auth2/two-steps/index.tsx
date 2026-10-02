@@ -1,37 +1,102 @@
+import { useState, type FormEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
-import { Link } from "react-router";
-import FullLogo from "src/layouts/full/shared/logo/FullLogo";
-import { Field, FieldGroup } from "@/components/ui/field";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
+import { FieldError } from "@/components/ui/field";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { verifyEmail } from "@/api/auth/auth-api";
+import { FetchError } from "@/api/global-fetcher";
+import { AuthShowcase, BrandMark } from "../auth-showcase";
 
+const CODE_LENGTH = 6;
+const INVALID_CODE = "Código inválido ou expirado";
+const GENERIC_ERROR = "Não foi possível confirmar seu e-mail agora. Tente novamente em instantes.";
 
+// 400 é problema do código (inválido/expirado ou fora do formato); o resto fica na mensagem genérica.
+const toSubmitError = (err: unknown): { code?: string; form?: string } => {
+  if (err instanceof FetchError && err.status === 400) {
+    const body = err.body as { message?: string; errors?: Record<string, string> } | undefined;
+    if (body?.errors?.code) return { code: `Código ${body.errors.code}.` };
+    return { code: body?.message ?? INVALID_CODE };
+  }
+  return { form: GENERIC_ERROR };
+};
 
+// Confirmação do e-mail após o cadastro: o e-mail chega pelo state da navegação vinda do registro.
 const BoxedTwoStep = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const email = (location.state as { email?: string } | null)?.email;
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState<string>();
+  const [error, setError] = useState<string>();
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!email || submitting || code.length !== CODE_LENGTH) return;
+    setCodeError(undefined);
+    setError(undefined);
+    setSubmitting(true);
+    try {
+      await verifyEmail({ email, code });
+      // Nenhum token aqui: o acesso começa no login, agora liberado.
+      navigate("/auth/auth2/login", { replace: true });
+    } catch (err) {
+      const { code: codeMessage, form } = toSubmitError(err);
+      setCodeError(codeMessage);
+      setError(form);
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <>
-      <div className="relative overflow-hidden h-screen bg-muted">
-        <div className="flex h-full justify-center items-center px-4">
-          <Card className="md:w-112.5 w-full border-none p-6">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-background">
+      <AuthShowcase />
 
-            <div className="mx-auto  w-fit">
-              <FullLogo />
+      {/* Email verification form */}
+      <main className="flex items-center justify-center px-4 py-10 sm:px-6">
+        <div className="w-full max-w-md space-y-6">
+          <div className="lg:hidden flex justify-center">
+            <BrandMark />
+          </div>
+
+          <Card className="w-full border-none shadow-lg p-6 sm:p-8">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-semibold text-foreground">Confirme seu e-mail</h2>
+              {email && (
+                <p className="text-sm text-muted-foreground">
+                  Enviamos um código de 6 dígitos para{" "}
+                  <span className="font-medium text-foreground break-all">{email}</span>. Digite o
+                  código abaixo para ativar seu acesso.
+                </p>
+              )}
             </div>
-            <div className="text-center flex flex-col gap-2">
 
-              <p className="text-sm font-normal text-muted-foreground">
-                We sent a verification code to your mobile. Enter the code below to verify your identity.
-
-
-              </p>
-              <p className="font-bold">******1234</p>
-            </div>
-
-            <form className="space-y-6 w-full">
-              <FieldGroup className="gap-6">
-                <div className="flex flex-col  gap-6 sm:gap-8">
-                  <InputOTP maxLength={6} id="otp" required>
-
+            {email ? (
+              <form className="space-y-6 w-full" onSubmit={handleSubmit}>
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-1.5">
+                  <InputOTP
+                    maxLength={CODE_LENGTH}
+                    pattern={REGEXP_ONLY_DIGITS}
+                    id="otp"
+                    autoComplete="one-time-code"
+                    value={code}
+                    onChange={(value) => {
+                      setCode(value);
+                      setCodeError(undefined);
+                    }}
+                    aria-invalid={Boolean(codeError)}
+                    disabled={submitting}
+                    autoFocus
+                  >
                     <InputOTPGroup className="gap-1 *:data-[slot=input-otp-slot]:rounded-lg *:data-[slot=input-otp-slot]:flex-1 *:data-[slot=input-otp-slot]:size-9  w-full">
                       <InputOTPSlot index={0} />
                       <InputOTPSlot index={1} />
@@ -41,30 +106,40 @@ const BoxedTwoStep = () => {
                       <InputOTPSlot index={5} />
                     </InputOTPGroup>
                   </InputOTP>
-
-                  <Field className="gap-4">
-                    <Button
-                      type="submit"
-                      size={"lg"}
-                      className="rounded-lg"
-                    >
-                      Verify Now
-                    </Button>
-
-                  </Field>
+                  {codeError && <FieldError>{codeError}</FieldError>}
                 </div>
-              </FieldGroup>
-            </form>
-            <div className="flex gap-2 text-base text-muted-foreground font-medium mt-4 items-center justify-center">
-              <p>Didn't get the code?</p>
-              <Link to={"/"} className="text-primary text-sm font-medium">
-                Resend
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full rounded-lg"
+                  disabled={submitting || code.length !== CODE_LENGTH}
+                >
+                  {submitting ? "Verificando..." : "Verificar"}
+                </Button>
+              </form>
+            ) : (
+              // Acesso direto ou página recarregada: sem o e-mail do cadastro não há o que verificar.
+              <Alert>
+                <AlertDescription>
+                  Não encontramos o e-mail do seu cadastro. Faça o cadastro novamente para receber um
+                  novo código de confirmação.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <p className="text-center text-sm text-muted-foreground">
+              {email ? "Já confirmou seu e-mail?" : "Precisa se cadastrar?"}{" "}
+              <Link
+                to={email ? "/auth/auth2/login" : "/auth/auth2/register"}
+                className="font-medium text-primary hover:underline"
+              >
+                {email ? "Entrar" : "Criar seu acesso"}
               </Link>
-            </div>
+            </p>
           </Card>
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 };
 

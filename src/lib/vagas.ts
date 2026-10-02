@@ -41,6 +41,9 @@ export const createEtapa = (name: string, order: number): EtapaType => ({
   order,
   type: "PADRAO",
   candidatesCount: 0,
+  reprovadosCount: 0,
+  chegaramCount: 0,
+  taxaReprovacao: null,
 });
 
 export const createDefaultEtapas = (): EtapaType[] =>
@@ -49,6 +52,9 @@ export const createDefaultEtapas = (): EtapaType[] =>
     id: uuidv4(),
     order: index + 1,
     candidatesCount: 0,
+    reprovadosCount: 0,
+    chegaramCount: 0,
+    taxaReprovacao: null,
   }));
 
 export const countCandidates = (etapas: EtapaType[]) =>

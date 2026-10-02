@@ -1,260 +1,198 @@
-<p align="center">
-   <a href="https://shadcndashboard.dev" target="_blank">
-      <img src="https://shadcndashboard-demo.vercel.app/images/logos/logoicon.svg" alt="shadcndashboard-logo" width="50px" height="50px">
-   </a>
-</p>
+# Recruiter Visual — Frontend
 
-<h1 align="center">
-   <a href="https://shadcndashboard.dev" target="_blank" align="center">
-      Shadcn Dashboard - Free Shadcn Admin Dashboard Template (React + Vite)
-   </a>
-</h1>
+Interface web do **Recruiter Visual**, uma aplicação de apoio visual ao processo seletivo: o recruiter acompanha suas vagas, as etapas de cada uma e a posição dos candidatos em um funil e em um Kanban.
 
-<p align="start">Shadcn Dashboard is a modern, responsive admin dashboard template built with React (Vite). Built with Shadcn UI, Base UI and Tailwind CSS v4, it ships with a modern dashboard, Blog, Notes & Tickets apps, authentication pages, form layouts, data tables, user profile, and rich UI components - giving you everything you need to build your next admin panel faster.</p>
+Este repositório contém apenas a camada de interface:
 
-<!-- ![GitHub](https://img.shields.io/github/license/shadcndashboard/shadcndashboard) ![GitHub issues](https://img.shields.io/github/issues/shadcndashboard/shadcndashboard) ![GitHub closed issues](https://img.shields.io/github/issues-closed/shadcndashboard/shadcndashboard) ![Twitter Follow](https://img.shields.io/twitter/follow/shadcndashboard?style=social) -->
+- o frontend consome a API REST do backend (`recruiter-visual-api`);
+- as regras de negócio e a autorização são responsabilidade do backend;
+- o frontend exibe o que a API devolve e envia as ações do usuário, sem ser fonte de verdade dessas regras.
 
-<kbd>[![Shadcn Dashboard - Demo Screenshot](https://shadcndashboard-demo.vercel.app/OG-Image.png)](https://shadcndashboard.dev)</kbd>
+O Recruiter Visual não se propõe a ser um ATS completo. O foco é a visualização e a movimentação de candidatos nas etapas de uma vaga.
 
-## Introduction 📊
+## Stack
 
-Shadcn Dashboard is a production-ready admin dashboard starter to kickstart your next project. It features a modern dashboard, Blog, Notes & Tickets apps, authentication flows, form layouts with validation, data tables, user profile pages, and a comprehensive library of Shadcn UI components.
+| Área | Tecnologia |
+|---|---|
+| Linguagem e biblioteca de UI | TypeScript, React 19 |
+| Build e servidor de desenvolvimento | Vite |
+| Rotas | React Router (SPA, rotas no cliente) |
+| Estilos | Tailwind CSS v4, `class-variance-authority`, `tailwind-merge` |
+| Componentes | Base UI (`@base-ui/react`), com componentes próprios em `src/components/ui` |
+| Dados e cache | SWR |
+| Gráficos | Recharts (funis da vaga) |
+| Ícones | `lucide-react` e `@iconify/react` |
 
-Available in both **React (Vite)** and **Next.js** versions!
+As versões exatas estão no `package.json`.
 
-- [View Demo (React)](https://shadcndashboard-demo.vercel.app)
-- [Next.js Free Version Repository](https://github.com/shadcndashboard/next-shadcn-dashboard)
-- [View Documentation](https://shadcndashboard.dev/docs)
+## Arquitetura resumida
 
-<p>
-   Crafted with ❤️ by
-   <a href="https://shadcndashboard.dev" target="_blank">
-      shadcndashboard.dev
-   </a>
-   , committed to empowering the open-source community.
-</p>
-
-## Key Features ✨
-
-- **Modern Dashboard** - Ready-to-use dashboard layout with statistics, charts, and widgets
-- **Apps** - Blog, Notes, and Tickets apps out of the box
-- **Authentication Pages** - Login, Register, Forgot Password, OTP Verification, Reset Password, Two-Factor Auth
-- **Forms & Tables** - Vertical & Horizontal form layouts and a data table
-- **User Profile** - Rich profile page with connections and activity views
-- **Built with React 19 + Vite** - Modern, fast, and SEO-friendly
-- **Tailwind CSS v4** - Easy theming and utility-based styling
-- **Responsive & Mobile-First** - Designed to look great on all devices
-- **Dark Mode Support** - Full light/dark theme toggle via a custom `ThemeProvider`/`useTheme` context
-- **Rich Charting** - Recharts integration for beautiful visualizations
-- **Rich Text Editor** - TipTap-powered editor for the Blog app
-
-## Folder Structure
-
-```
-|-- public/                                    # Static assets served from the site root
-|-- src/                                       # Application source code
-|   |-- App.tsx                                # Root application component
-|   |-- main.tsx                               # Application entry point
-|   |-- api/                                   # API service layer and handlers
-|   |-- assets/                                # Local SVGs, images, and static helpers
-|   |-- components/                            # Shared React components
-|   |-- context/                               # React context providers
-|   |-- css/                                   # Global and component-level CSS
-|   |-- hooks/                                 # Reusable client hooks
-|   |-- layouts/                               # Dashboard shell layouts (Sidebar + Header)
-|   |-- lib/                                   # General utilities and helpers
-|   |-- routes/                                # React Router route definitions
-|   |   |-- Router.tsx                         # Central route configuration
-|   |-- types/                                 # Shared TypeScript interfaces and types
-|   |-- utils/                                 # Feature-specific helper functions
-|   |-- views/                                 # Page-level UI composed by route files
-|   |   |-- apps/                              # App view modules
-|   |   |   |-- blog/                          # Blog app views
-|   |   |   |-- notes/                         # Notes app views
-|   |   |   |-- tickets/                       # Tickets app views
-|   |   |-- auth/                              # Auth page views
-|   |   |   |-- auth2/                         # Two-factor auth views
-|   |   |   |-- authforms/                     # Login, Register, etc. views
-|   |   |   |-- error/                         # Error page views
-|   |   |   |-- maintenance/                   # Maintenance page views
-|   |   |-- dashboards/                        # Dashboard charts, statistics, and widgets
-|   |   |   |-- modern/                        # Modern dashboard view
-|   |   |-- icons/                             # Icon showcase views
-|   |   |-- pages/                             # Inner page views
-|   |   |   |-- form/                          # Form layout and validation views
-|   |   |   |-- tables/                        # Data table views
-|   |   |   |-- user-profile/                  # User profile views
-|   |   |-- spinner/                           # Loading spinner views
-|-- components.json                            # shadcn/ui aliases and registry config
-|-- index.html                                 # HTML entry point
-|-- vite.config.ts                             # Vite configuration
-|-- package.json                               # Scripts and dependencies
-|-- postcss.config.js                          # Tailwind CSS v4 PostCSS setup
-|-- tsconfig.json                              # TypeScript compiler and path aliases
+```text
+Usuário
+   ↓
+React / TypeScript
+   ↓ HTTP/REST
+Recruiter Visual API
+   ↓
+Spring Boot
 ```
 
-**Key UI Sections**
+O frontend é uma SPA estática. Toda regra de negócio (quem pode ver uma vaga, quando um candidato pode avançar, como a taxa de reprovação é calculada) é decidida pelo backend. A interface não recalcula esses resultados: apenas os apresenta e trata as respostas de erro da API.
 
-- **Dashboard** - Modern overview with statistics, charts, and widgets
-- **Apps** - Blog, Notes, and Tickets management
-- **Authentication** - Login, Register, and account recovery flows
-- **Forms & Tables** - Layouts, validation, and data table views
-- **User Pages** - Profile page with connections and activity
+## Pré-requisitos
 
----
+- Node.js e npm. O projeto não fixa uma versão mínima de Node; o `Dockerfile` do repositório usa a imagem `node:22-slim`.
+- Backend do Recruiter Visual em execução em `http://localhost:8080`.
+- O frontend sobe em `http://localhost:5173` (porta padrão do Vite).
 
-## What's Included 📦
+## Execução local
 
-- Dashboard
-  - Modern Dashboard
-- Apps
-  - Blog
-  - Notes
-  - Tickets
-- Pages
-  - User Profile
-  - Form Layouts
-  - Data Table
-- Authentication
-  - Login Page
-  - Register Page
-  - Forgot Password Page
-  - OTP Verification Page
-  - Reset Password Page
-  - Two Steps Verification Page
-  - Error Page
-  - Maintenance Page
-- Components
-  - Shadcn UI Primitives
-  - Recharts
-  - TipTap Rich Text Editor
-  - Data Tables
-  - Date Pickers & Calendar
-  - File Dropzone
-  - OTP Input
-- Miscellaneous
-  - Icons Showcase
-  - Dark / Light Mode
+```bash
+npm install
+npm run dev
+```
 
-## 🚀 Quick Start
+Build de produção (executa a checagem de tipos com `tsc` antes do `vite build`; erros de TypeScript interrompem o build):
 
-### Prerequisites
+```bash
+npm run build
+```
 
-- Node.js 18, 20, or 22+
-- npm
+Para servir localmente o resultado do build:
 
-1. **Install dependencies:**
+```bash
+npm run preview
+```
 
-   ```bash
-   npm install
-   ```
+> **Lint:** `npm run lint` não funciona no estado atual. O projeto tem a configuração em `.eslintrc.cjs`, e a versão instalada do ESLint espera `eslint.config.js`. Veja [Limitações conhecidas](#limitações-conhecidas).
 
-2. **Start the development server:**
+## Integração com o backend
 
-   ```bash
-   npm run dev
-   ```
+```text
+Frontend
+   ↓ /api
+Vite dev proxy
+   ↓
+http://localhost:8080
+```
 
-   The site will be available at `http://localhost:5173`
+No desenvolvimento local, toda chamada a `/api/...` é encaminhada pelo proxy do Vite (`vite.config.ts`) para o backend, sem o prefixo `/api`. Por exemplo, `/api/vagas` chega ao backend como `/vagas`.
 
-3. **Build for production:**
+Esse proxy existe apenas no servidor de desenvolvimento. O repositório tem arquivos para servir o build estático (`Dockerfile`, `nginx.conf`, `netlify.toml`), mas nenhum deles encaminha `/api` para o backend. A estratégia de acesso à API em produção ainda precisa ser definida antes do deploy.
 
-   ```bash
-   npm run build
-   ```
+## Autenticação e sessão
 
-4. **Preview the production build:**
+- **Registro:** a tela de cadastro envia nome, e-mail e senha para a API. Nenhum token é criado nesse momento.
+- **Verificação de e-mail:** depois do cadastro, o recruiter informa o código de 6 dígitos recebido por e-mail. Com o e-mail confirmado, ele é levado ao login.
+- **Login:** em caso de sucesso, a API devolve um JWT e os dados básicos do recruiter (nome e e-mail).
+- **Armazenamento:** o token fica no `localStorage`, na chave `recruiter-visual.token`. Nome e e-mail ficam na chave `recruiter-visual.user`. A senha nunca é armazenada.
+- **Envio do token:** todas as chamadas feitas pelo fetcher do projeto (`src/api/global-fetcher.ts`) enviam o cabeçalho `Authorization: Bearer <token>` quando há sessão.
+- **Rotas protegidas:** sem token, qualquer tela da aplicação redireciona para o login, que devolve o usuário à tela que ele tentava abrir.
+- **Sessão expirada ou inválida:** a validade do token é verificada pelo backend. Uma resposta `401` faz o frontend descartar o token e redirecionar para o login.
+- **Logout:** remove o token e os dados do usuário e limpa o cache de dados da sessão.
 
-   ```bash
-   npm run preview
-   ```
+## Rotas principais
 
-## 🧞 Available Commands
+| Rota | Tela | Acesso |
+|---|---|---|
+| `/` | Redireciona para `/apps/vagas` | Autenticado |
+| `/apps/vagas` | Minhas vagas | Autenticado |
+| `/apps/vagas/create` | Nova vaga | Autenticado |
+| `/apps/vagas/:id` | Detalhe da vaga | Autenticado |
+| `/auth/auth2/login` | Login | Público |
+| `/auth/auth2/register` | Cadastro | Público |
+| `/auth/auth2/two-steps` | Verificação de e-mail | Público |
+| `/auth/404` | Página não encontrada | Público |
 
-All scripts can be run using npm.
+As rotas são definidas em `src/routes/Router.tsx`.
 
-| Command   | Action                                                                        |
-| :-------- | :---------------------------------------------------------------------------- |
-| `dev`     | Starts the Vite development server with hot-reload at `http://localhost:5173` |
-| `build`   | Creates an optimized production build via TypeScript + Vite                   |
-| `preview` | Preview the production build locally before deploying                         |
-| `lint`    | Runs ESLint to check for potential errors and code quality issues             |
+## Fluxo de vagas
 
-## Documentation 📚
+- **Minhas vagas (`/apps/vagas`):** lista as vagas do recruiter autenticado, com código, status, título e data de criação, e permite buscar pelo código da vaga.
+- **Nova vaga (`/apps/vagas/create`):** cria a vaga com código, título, descrição e as etapas configuradas na tela. As etapas podem ser adicionadas, renomeadas, reordenadas e excluídas; a etapa de fechamento pode ser renomeada, mas fica sempre por último e não pode ser excluída.
+- **Detalhe da vaga (`/apps/vagas/:id`):** usa o `id` da rota para carregar da API a vaga, suas etapas, os candidatos ativos, os candidatos reprovados e as avaliações. Uma vaga inexistente ou de outro recruiter é tratada como "não encontrada".
 
-For comprehensive documentation, please visit [shadcndashboard.dev/docs](https://shadcndashboard.dev/docs).
+No detalhe, as etapas devolvidas pela API alimentam o funil e o Kanban, o status da vaga é refletido na interface e as avaliações por etapa de todos os candidatos são carregadas em uma única requisição.
 
-## Changelog 📆
+## Funil e Kanban
 
-Please refer to the [CHANGELOG file](CHANGELOG.md). We add detailed release notes to each new release.
+O funil e o Kanban usam a mesma lista de etapas, na ordem definida pelo backend.
 
-## License ©
+- **Funil:** mostra a quantidade de candidatos ativos em cada etapa.
+- **Funil de reprovados:** mostra quantos candidatos foram reprovados em cada etapa.
+- **Taxa de reprovação por etapa:** exibida abaixo do funil de reprovados, usando diretamente o valor calculado pelo backend. Quando ninguém chegou à etapa, a interface mostra `—`.
+- **Kanban:** uma coluna por etapa, com os candidatos ativos na etapa em que estão. Cada card mostra nome, stack, LinkedIn e a avaliação da etapa.
+- **Avançar:** botão no card que move o candidato para a próxima etapa.
+- **Reprovar:** botão no card, com confirmação, que reprova o candidato na etapa atual. Não está disponível na etapa de fechamento.
+- **Reprovados:** seção que lista os candidatos reprovados e a etapa em que cada reprovação aconteceu.
 
-- Copyright © [shadcndashboard.dev](https://shadcndashboard.dev/)
-- Licensed under [MIT](LICENSE)
-- All our free items are Open Source and licensed under MIT. You can use our free items for personal as well as commercial purposes. We just need attribution from your end. Copy the link below and paste it in the footer of your web application or project.
-  ```html
-  <a href="https://shadcndashboard.dev/">Shadcn Dashboard</a>
-  ```
+A movimentação dos candidatos é feita pelos botões do card.
 
----
+## Avaliação por etapa
 
-<br />
+- A avaliação pertence ao par **candidato + etapa**: a nota de uma etapa não substitui nem é copiada para outra.
+- Cada card mostra cinco estrelas com o rótulo "Avaliação desta etapa", sempre referentes à etapa atual do candidato. Sem avaliação, as estrelas aparecem vazias.
+- A nota vai de 1 a 5 e é dada clicando diretamente em uma estrela do card.
+- As avaliações da vaga são carregadas em lote, em uma única requisição. Não há requisição individual por card.
+- O clique salva a nota pelo endpoint de avaliação do backend, com atualização otimista: a estrela muda imediatamente e, se a API recusar, a nota anterior é restaurada e o card mostra uma mensagem de erro.
+- A avaliação continua disponível em qualquer status da vaga, conforme a regra do backend.
 
-<a href="https://shadcndashboard.dev" target="_blank">
-  <img src="https://shadcndashboard.dev/images/og-image/homepage.webp" alt="shadcndashboard banner" width="1200">
-</a>
+## Status da vaga
 
-<p>
-   <a href="https://shadcndashboard.dev" target="_blank">
-      shadcndashboard.dev
-   </a>
-   is a free and open-source admin dashboard template built with Shadcn UI, Base UI, Tailwind CSS v4, and React - designed to help developers ship beautiful admin panels faster. 🚀
-</p>
+A interface apresenta quatro status, com um selo colorido ao lado do código da vaga:
 
-## Overview 🌏
+| Status | Apresentação | Ações de status disponíveis |
+|---|---|---|
+| `ATUANDO` | Verde | Suspender processo, Cancelar processo |
+| `PAUSADA` | Amarelo | Retomar processo, Cancelar processo |
+| `FECHADA` | Neutro | Nenhuma |
+| `CANCELADA` | Vermelho | Nenhuma |
 
-Shadcn Dashboard is a production-ready admin dashboard kit built with React, Vite, TypeScript, Tailwind CSS v4, Shadcn UI, and Base UI. It ships with reusable UI blocks, a full component library, pre-built app pages, and authentication flows - so you can go from zero to a fully functional admin panel in minutes.
+- As ações ficam no menu "Alterar status" do detalhe da vaga e pedem confirmação antes de serem enviadas.
+- Quando a vaga não está `ATUANDO`, os botões de cadastrar candidato, avançar e reprovar ficam desabilitados. Os dados continuam visíveis.
+- O status exibido é sempre o devolvido pela API.
 
-- Production-ready blocks: dashboards, charts, tables, forms, and full apps
-- Built on Base UI primitives for full design control
+As regras de negócio de cada status estão documentadas no backend, em `docs/ARQUITETURA.md` do projeto `recruiter-visual-api`.
 
-### Backed by WrapPixel 🏆
+## Organização do frontend
 
-Shadcn Dashboard is proudly backed by [WrapPixel](https://wrappixel.com) - a trusted name in the admin dashboard space with over **15+ years** of experience building production-grade UI templates and component systems. WrapPixel's products are used by **600k+ developers and agencies** worldwide, consistently rated **4.9/5** for quality, consistency, and developer experience.
+| Diretório | Responsabilidade |
+|---|---|
+| `src/views` | Telas (páginas) da aplicação. As de vagas ficam em `src/views/apps/vagas` e as de autenticação em `src/views/auth/auth2`. |
+| `src/components` | Componentes reutilizáveis. Os de vagas (funil, Kanban, editor de etapas, selo e ações de status, cadastro de candidato) ficam em `src/components/apps/vagas`; os componentes de base ficam em `src/components/ui`. |
+| `src/context` | Contextos e hooks de dados. `src/context/vagas-context` concentra as leituras e ações de vagas, etapas, candidatos e avaliações. |
+| `src/api` | Camada de acesso HTTP: o fetcher com o JWT (`global-fetcher.ts`) e as chamadas de autenticação (`auth/auth-api.ts`). |
+| `src/types` | Tipos TypeScript compartilhados, incluindo os contratos da API de vagas (`apps/vagas.ts`). |
+| `src/layouts` | Estruturas de página: layout com header para as telas autenticadas e layout em branco para as telas públicas. |
+| `src/routes` | Definição das rotas e a proteção das telas autenticadas (`RequireAuth`). |
+| `src/lib` | Funções auxiliares: sessão (`auth-token.ts`) e regras de formatação e validação de vagas (`vagas.ts`). |
+| `src/hooks` | Hooks genéricos de interface. |
+| `src/css` | Estilos globais. |
 
-## Community 🤝
+## Estado e cache
 
-Join the Shadcn Dashboard community to ask questions, share ideas, and get help:
+Os dados da API são carregados com SWR, por meio dos contextos e hooks de `src/context/vagas-context`:
 
-- 🐦 [Follow us on Twitter](https://x.com/shadcndashboard)
-- 🎮 [Join us on Discord](https://discord.com/invite/eMzE8F6Wqs)
+- as telas não chamam a API diretamente; elas usam esses hooks, que expõem os dados e as ações;
+- depois de uma ação (cadastrar, avançar, reprovar, alterar status), apenas os dados afetados são recarregados da API, sem recarregar a página;
+- a avaliação por etapa usa atualização otimista sobre os dados de avaliações;
+- o cache é limpo no login e no logout, para que os dados de um recruiter não apareçam para outro.
 
-## Credits 🤘
+## Limitações conhecidas
 
-We are grateful for the contributions of the open-source community, particularly:
+- `npm run lint` está incompatível com a configuração de ESLint existente (`.eslintrc.cjs` com uma versão do ESLint que espera `eslint.config.js`).
+- O repositório ainda tem arquivos e rotas herdados da base inicial do projeto que não fazem parte do fluxo principal do Recruiter Visual.
+- A estratégia de acesso à API em produção ainda precisa ser definida antes do deploy.
+- O frontend não tem suíte de testes automatizados própria.
 
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Vite](https://vitejs.dev/)
-- [Base UI](https://mui.com/base-ui/)
-- [TanStack Table](https://tanstack.com/table)
-- [Recharts](https://recharts.org/)
-- [TipTap](https://tiptap.dev/)
+## Backend relacionado
 
-These projects form the backbone of Shadcn Dashboard.
+O backend fica em um projeto separado, `recruiter-visual-api`. A documentação técnica dele está em:
 
-## Useful Links 🎁
+- `README.md`
+- `docs/ARQUITETURA.md`
+- `docs/FLUXOS.md`
 
-- [Shadcn Dashboard Website](https://shadcndashboard.dev)
-- [Documentation](https://shadcndashboard.dev/docs)
-- [React Demo](https://shadcndashboard-demo.vercel.app/)
-- [Next.js Free Version (GitHub Repository)](https://github.com/shadcndashboard/next-shadcn-dashboard)
-- [Changelog](CHANGELOG.md)
-- [License](LICENSE)
+## SSO
 
-## Social Media 🌐:
-
-- [Twitter / X](https://x.com/shadcndashboard)
-- [Discord](https://discord.com/invite/eMzE8F6Wqs)
-- [GitHub](https://github.com/shadcndashboard/shadcndashboard)
+O suporte a SSO corporativo não está implementado atualmente. O caminho arquitetural futuro está documentado no backend, em `docs/ARQUITETURA.md`.

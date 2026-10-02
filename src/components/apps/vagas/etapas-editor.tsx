@@ -49,16 +49,32 @@ const EtapasEditor = ({
   const renameEtapa = (id: string, name: string) =>
     onChange(etapas.map((etapa) => (etapa.id === id ? { ...etapa, name } : etapa)));
 
+  // O backend exige o fechamento na última posição: ele não se move e nenhuma etapa troca de lugar com ele.
+  const canMove = (index: number, direction: -1 | 1) => {
+    const target = etapas[index + direction];
+    return Boolean(target) && !isEtapaFechamento(etapas[index]) && !isEtapaFechamento(target);
+  };
+
   const moveEtapa = (index: number, direction: -1 | 1) => {
+    if (!canMove(index, direction)) return;
     const next = [...etapas];
     [next[index], next[index + direction]] = [next[index + direction], next[index]];
     onChange(withExplicitOrder(next));
   };
 
+  // A nova etapa entra antes do fechamento, que continua por último.
   const addEtapa = () => {
     const name = newEtapaName.trim();
     if (!name) return;
-    onChange([...etapas, createEtapa(name, etapas.length + 1)]);
+    const fechamentoIndex = etapas.findIndex(isEtapaFechamento);
+    const position = fechamentoIndex === -1 ? etapas.length : fechamentoIndex;
+    onChange(
+      withExplicitOrder([
+        ...etapas.slice(0, position),
+        createEtapa(name, position + 1),
+        ...etapas.slice(position),
+      ]),
+    );
     setNewEtapaName("");
   };
 
@@ -114,8 +130,12 @@ const EtapasEditor = ({
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  aria-label={`Mover "${etapa.name}" para cima`}
-                  disabled={disabled || index === 0}
+                  aria-label={
+                    fechamento
+                      ? "A etapa de fechamento fica sempre por último"
+                      : `Mover "${etapa.name}" para cima`
+                  }
+                  disabled={disabled || !canMove(index, -1)}
                   onClick={() => moveEtapa(index, -1)}
                 >
                   <ArrowUp />
@@ -124,8 +144,12 @@ const EtapasEditor = ({
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  aria-label={`Mover "${etapa.name}" para baixo`}
-                  disabled={disabled || index === etapas.length - 1}
+                  aria-label={
+                    fechamento
+                      ? "A etapa de fechamento fica sempre por último"
+                      : `Mover "${etapa.name}" para baixo`
+                  }
+                  disabled={disabled || !canMove(index, 1)}
                   onClick={() => moveEtapa(index, 1)}
                 >
                   <ArrowDown />
@@ -174,7 +198,7 @@ const EtapasEditor = ({
 
       <FieldDescription>
         A ordem das etapas define o funil e o Kanban da vaga. A etapa de fechamento pode ser
-        renomeada e reordenada, mas não pode ser excluída.
+        renomeada, mas fica sempre por último e não pode ser excluída.
       </FieldDescription>
       {error && <FieldError>{error}</FieldError>}
 

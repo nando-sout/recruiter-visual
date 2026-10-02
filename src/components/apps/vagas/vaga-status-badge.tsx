@@ -6,7 +6,7 @@ import { VagaStatus } from "src/types/apps/vagas";
 const statusClassName: Record<VagaStatus, string> = {
   ATUANDO: "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400",
   PAUSADA: "bg-amber-500/10 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400",
-  FECHADA: "bg-sky-500/10 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400",
+  FECHADA: "bg-muted text-muted-foreground",
   CANCELADA: "bg-destructive/10 text-destructive dark:bg-destructive/20",
 };
 

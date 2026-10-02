@@ -1,16 +1,37 @@
-import type { FormEvent } from "react";
-import { Link } from "react-router";
+import { useState, type FormEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { LoginError, login, startSession } from "@/api/auth/auth-api";
 import { AuthShowcase, BrandMark } from "../auth-showcase";
+import { PasswordInput } from "../password-input";
 
 const BoxedLogin = () => {
-  // Visual-only form for now: no authentication is wired up yet.
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string>();
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(undefined);
+    setSubmitting(true);
+    try {
+      const response = await login(email.trim(), password);
+      // Guarda o JWT e o nome/e-mail do perfil; a senha fica apenas no estado do formulário, que é descartado na navegação.
+      await startSession(response);
+      const from = (location.state as { from?: string } | null)?.from;
+      navigate(from && from !== "/" ? from : "/apps/vagas", { replace: true });
+    } catch (err) {
+      setError(err instanceof LoginError ? err.message : "Não foi possível entrar agora. Tente novamente em instantes.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -33,6 +54,11 @@ const BoxedLogin = () => {
             </div>
 
             <form className="space-y-6 w-full" onSubmit={handleSubmit}>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <Label
@@ -47,6 +73,9 @@ const BoxedLogin = () => {
                     autoComplete="email"
                     placeholder="voce@email.com"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={submitting}
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -56,12 +85,14 @@ const BoxedLogin = () => {
                   >
                     Senha
                   </Label>
-                  <Input
+                  <PasswordInput
                     id="password"
-                    type="password"
                     autoComplete="current-password"
                     placeholder="Digite sua senha"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={submitting}
                   />
                 </div>
                 <div className="flex items-center space-x-3 text-sm">
@@ -74,8 +105,8 @@ const BoxedLogin = () => {
                   </Label>
                 </div>
               </div>
-              <Button type="submit" size="lg" className="w-full rounded-lg">
-                Entrar
+              <Button type="submit" size="lg" className="w-full rounded-lg" disabled={submitting}>
+                {submitting ? "Entrando..." : "Entrar"}
               </Button>
             </form>
 

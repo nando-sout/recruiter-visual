@@ -70,7 +70,7 @@ const MessagesLink: MessageType[] = [
 ];
 
 //   Notification Data
-import { Calendar, Settings, LucideIcon, Command, LayoutPanelLeft, Files } from 'lucide-react';
+import { Calendar, Settings, LucideIcon, Command, LayoutPanelLeft } from 'lucide-react';
 
 interface NotificationType {
   title: string;
@@ -149,37 +149,13 @@ interface profileType {
   badge: boolean;
 }
 
-import { Home, User, Keyboard } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 const profileDD: profileType[] = [
   {
     avatar: Home,
     title: 'Home',
-    href: '/',
-    badge: false
-  },
-  {
-    avatar: User,
-    title: 'Profile',
-    href: '/',
-    badge: false
-  },
-  {
-    avatar: Files,
-    title: 'Invoice',
-    href: '/',
-    badge: true
-  },
-  {
-    avatar: Keyboard,
-    title: 'Subscription',
-    href: '/',
-    badge: false
-  },
-  {
-    avatar: Settings,
-    title: 'Account Settings',
-    href: '/',
+    href: '/apps/vagas',
     badge: false
   }
 ];

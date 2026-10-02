@@ -3,15 +3,11 @@
 import { lazy } from 'react';
 import { Navigate, createBrowserRouter } from 'react-router';
 import Loadable from '../layouts/full/shared/loadable/Loadable';
+import RequireAuth from './RequireAuth';
 
 /* ***Layouts**** */
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
 const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')));
-
-
-// dashboards
-
-const ModernDashboard = Loadable(lazy(() => import('../views/dashboards/modern')));
 
 const Error = Loadable(lazy(() => import('../views/auth/error')));
 
@@ -54,11 +50,15 @@ const Maintainance = Loadable(lazy(() => import('../views/auth/maintenance')));
 const Router = [
   {
     path: '/',
-    element: <FullLayout />,
+    // Telas da aplicação: exigem login. O BlankLayout abaixo (login, registro, erros) continua público.
+    element: (
+      <RequireAuth>
+        <FullLayout />
+      </RequireAuth>
+    ),
     children: [
-      { path: '/', element: <ModernDashboard /> },
-
-      { path: '/dashboards/modern', element: <ModernDashboard /> },
+      // Minhas vagas é a tela principal do produto.
+      { path: '/', element: <Navigate to="/apps/vagas" replace /> },
 
       { path: '/apps/blog/post', element: <Blog /> },
       { path: '/apps/blog/detail/:id', element: <BlogDetail /> },

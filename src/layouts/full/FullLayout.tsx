@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import Sidebar from './vertical/sidebar/Sidebar';
 import Header from './vertical/header/Header';
 import { SidebarInset, SidebarProvider } from 'src/components/ui/sidebar';
 import { cn } from 'src/lib/utils';
@@ -13,9 +12,6 @@ const FullLayout: FC = () => {
            defaultOpen={true}
       style={{ "--sidebar-width-icon": "52px" } as React.CSSProperties}
     >
-      
-        <Sidebar />
-     
       <SidebarInset className="outline outline-border m-2 rounded-none! overflow-hidden">
         {/* Top Header  */}
        <Header /> 

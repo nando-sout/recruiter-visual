@@ -7,7 +7,7 @@ import {
   SheetFooter,
   SheetClose,
 } from "src/components/ui/sheet";
-import { Avatar, AvatarImage, AvatarFallback } from "src/components/ui/avatar";
+import { Avatar, AvatarFallback } from "src/components/ui/avatar";
 import { Button } from "src/components/ui/button";
 import { Icon } from "@iconify/react";
 
@@ -15,19 +15,31 @@ import { cn } from "src/lib/utils";
 import { Mailbox } from 'lucide-react';
 
 import { profileDD } from "./data";
-import { Link } from "react-router";
-import avatar from '@/assets/images/profile/avtar.webp';
-import Buynow from '@/assets/images/backgrounds/sidebarbuynow.svg';
+import { Link, useNavigate } from "react-router";
+import { endSession } from "src/api/auth/auth-api";
+import { LOGIN_PATH, getUser } from "src/lib/auth-token";
 export default function ProfileSheet() {
+  const navigate = useNavigate();
+  // Nome e e-mail vêm do LoginResponse, guardados no login junto com o token.
+  const user = getUser();
+  const name = user?.name || "Recruiter";
+  // O avatar é a primeira letra do nome do recruiter logado.
+  const initial = name.trim().charAt(0).toUpperCase();
 
+  // replace: o botão voltar não retorna à tela protegida, e o RequireAuth barra qualquer URL direta sem token.
+  const handleLogout = async () => {
+    await endSession();
+    navigate(LOGIN_PATH, { replace: true });
+  };
 
   return (
     <Sheet>
       {/* Trigger Button */}
       <SheetTrigger className="cursor-pointer hover:bg-primary/5 flex items-center justify-center rounded-full h-10 w-10">
         <Avatar className="h-8 w-8">
-          <AvatarImage src={avatar} alt="profile" />
-          <AvatarFallback>CM</AvatarFallback>
+          <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+            {initial}
+          </AvatarFallback>
         </Avatar>
       </SheetTrigger>
 
@@ -44,25 +56,23 @@ export default function ProfileSheet() {
         <div className="p-6 py-6">
           <div className="flex flex-col gap-4 justify-center items-center pt-10">
             <Avatar className="h-16 w-16">
-              <AvatarImage
-                src={avatar}
-                alt="Profile"
-                width={30}
-                height={30}
-              />
-              <AvatarFallback>CM</AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-2xl font-semibold text-primary">
+                {initial}
+              </AvatarFallback>
             </Avatar>
 
             <div className="text-center">
-              <h6 className="text-lg font-semibold">Cameron</h6>
-              <div className="flex items-center gap-2 justify-center">
-                <Mailbox
-                  size={18} className="text-muted-foreground"
-                />
-                <span className="text-sm font-normal text-muted-foreground">
-                  info@shadcndashboard.com
-                </span>
-              </div>
+              <h6 className="text-lg font-semibold">{name}</h6>
+              {user?.email && (
+                <div className="flex items-center gap-2 justify-center">
+                  <Mailbox
+                    size={18} className="text-muted-foreground"
+                  />
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {user.email}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -105,25 +115,9 @@ export default function ProfileSheet() {
         <SheetFooter className="px-0 pb-6">
           <div className="border-t border-border w-full">
             <div className="rounded-sm pt-6 flex flex-col justify-center items-center gap-3">
-              <div>
-                <img
-                  src={Buynow}
-                  alt="login-bg"
-                />
-              </div>
-
-              <div className="text-center">
-                <h5 className="text-xl font-semibold">
-                  Grab ShadcnDashboard Admin
-                </h5>
-                <p className="text-sm text-muted-foreground">
-                  Customize your dashboard
-                </p>
-              </div>
-
               <Button
                 variant="secondary"
-                render={<Link to="/auth/auth2/login" />}
+                onClick={handleLogout}
                 className="text-primary"
               >
                 Log Out

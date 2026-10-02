@@ -21,13 +21,15 @@ import {
 } from "src/components/ui/field";
 import { Input } from "src/components/ui/input";
 import { Textarea } from "src/components/ui/textarea";
-import { VagasContext, VagasProvider } from "src/context/vagas-context";
+import { FetchError } from "src/api/global-fetcher";
+import { MinhasVagasContext, MinhasVagasProvider } from "src/context/vagas-context";
 import { cn } from "src/lib/utils";
 import {
   NovaVagaErrors,
   VAGA_DESCRIPTION_MAX_LENGTH,
   VAGA_TITLE_MAX_LENGTH,
   createDefaultEtapas,
+  isEtapaFechamento,
   validateNovaVaga,
 } from "src/lib/vagas";
 import { EtapaType, NovaVagaInput } from "src/types/apps/vagas";
@@ -39,12 +41,14 @@ const CharCount = ({ length, max }: { length: number; max: number }) => (
 );
 
 const NovaVagaForm = () => {
-  const { vagas, addVaga } = useContext(VagasContext);
+  const { vagas, addVaga } = useContext(MinhasVagasContext);
   const navigate = useNavigate();
 
   const [code, setCode] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  // As etapas configuradas aqui vão no POST /vagas, na ordem da tela. Os ids são temporários,
+  // só para o editor: id e posição definitivos são do backend.
   const [etapas, setEtapas] = useState<EtapaType[]>(createDefaultEtapas);
   const [errors, setErrors] = useState<NovaVagaErrors>({});
   const [submitError, setSubmitError] = useState(false);
@@ -66,10 +70,23 @@ const NovaVagaForm = () => {
 
     setSubmitting(true);
     try {
-      await addVaga(input);
+      await addVaga({
+        code: code.trim(),
+        title: title.trim(),
+        description: description.trim(),
+        etapas: etapas.map((etapa) => ({
+          name: etapa.name.trim(),
+          proposta: isEtapaFechamento(etapa),
+        })),
+      });
       navigate("/apps/vagas");
-    } catch {
-      setSubmitError(true);
+    } catch (err) {
+      // O código é único entre todas as vagas do sistema, não só entre as do recruiter.
+      if (err instanceof FetchError && err.status === 409) {
+        setErrors({ code: "Já existe uma vaga com este código." });
+      } else {
+        setSubmitError(true);
+      }
       setSubmitting(false);
     }
   };
@@ -209,9 +226,9 @@ const NovaVagaForm = () => {
 };
 
 const NovaVaga = () => (
-  <VagasProvider>
+  <MinhasVagasProvider>
     <NovaVagaForm />
-  </VagasProvider>
+  </MinhasVagasProvider>
 );
 
 export default NovaVaga;
