@@ -120,7 +120,7 @@ export default function ProfileSheet() {
                 onClick={handleLogout}
                 className="text-primary"
               >
-                Log Out
+                Sair
               </Button>
             </div>
           </div>

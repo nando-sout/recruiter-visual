@@ -11,7 +11,6 @@ import {
   EtapaType,
   VagaResponse,
   VagaStatusAlteravel,
-  VagaType,
 } from 'src/types/apps/vagas';
 
 // ---------- Backend real: listagem e criação (Minhas vagas, Nova vaga) ----------
@@ -107,7 +106,7 @@ export interface VagaDetail {
   avaliarCandidato: (candidato: CandidatoResponse, rating: number) => Promise<void>;
 }
 
-// GET /vagas/{id}, /etapas, /candidatos e /candidatos/reprovados em paralelo; o backend só devolve vagas do recruiter autenticado.
+// GET /vagas/{id}, /etapas, /candidatos, /candidatos/reprovados e /candidatos/avaliacoes em paralelo; o backend só devolve vagas do recruiter autenticado.
 export const useVagaDetail = (id: string | undefined): VagaDetail => {
   const vagaEndpoint = id ? `${API_VAGAS_ENDPOINT}/${encodeURIComponent(id)}` : null;
   const vagaResult = useSWR<VagaResponse, Error>(vagaEndpoint, getFetcher);
@@ -239,47 +238,4 @@ export const useVagaDetail = (id: string | undefined): VagaDetail => {
     changeStatus,
     avaliarCandidato,
   };
-};
-
-// ---------- Mock (MSW): edição de etapas, ainda não integrada ao backend ----------
-
-const VAGAS_ENDPOINT = '/api/data/vagas';
-
-interface VagasResponse {
-  status: number;
-  msg: string;
-  data: VagaType[];
-}
-
-export interface VagasContextType {
-  vagas: VagaType[];
-  loading: boolean;
-  error: Error | undefined;
-  updateEtapas: (id: string, etapas: EtapaType[]) => Promise<void>;
-}
-
-export const VagasContext = createContext<VagasContextType>({} as VagasContextType);
-
-export const VagasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { data, isLoading, error, mutate } = useSWR<VagasResponse, Error>(
-    VAGAS_ENDPOINT,
-    getFetcher,
-  );
-
-  const updateEtapas = async (id: string, etapas: EtapaType[]) => {
-    await mutate(putFetcher(`${VAGAS_ENDPOINT}/etapas`, { id, etapas }), { revalidate: false });
-  };
-
-  return (
-    <VagasContext.Provider
-      value={{
-        vagas: data?.data ?? [],
-        loading: isLoading,
-        error,
-        updateEtapas,
-      }}
-    >
-      {children}
-    </VagasContext.Provider>
-  );
 };

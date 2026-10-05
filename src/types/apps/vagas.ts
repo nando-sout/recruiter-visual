@@ -22,20 +22,14 @@ export interface EtapaType {
   taxaReprovacao: number | null;
 }
 
-export interface VagaType {
-  id: string;
+/** Dados do formulário de Nova vaga, validados na tela antes do envio. */
+export interface NovaVagaInput {
   /** Código informado pelo recruiter: obrigatório, único e de formato livre */
   code: string;
-  recruiterId: string;
   title: string;
   description: string;
-  status: VagaStatus;
   etapas: EtapaType[];
-  /** Data ISO (os dados trafegam como JSON pelos mocks) */
-  createdAt: string;
 }
-
-export type NovaVagaInput = Pick<VagaType, "code" | "title" | "description" | "etapas">;
 
 /**
  * Vaga como o backend devolve em GET /vagas, GET /vagas/{id} e POST /vagas (VagaResponse).
@@ -84,11 +78,6 @@ export type CreateVagaRequest = Pick<VagaResponse, "code" | "title" | "descripti
 
 /** Status que o recruiter pode definir por PUT /vagas/{vagaId}/status. */
 export type VagaStatusAlteravel = Exclude<VagaStatus, "FECHADA">;
-
-export interface UpdateEtapasInput {
-  id: string;
-  etapas: EtapaType[];
-}
 
 /** Candidato como o backend devolve em GET/POST /vagas/{vagaId}/candidatos (CandidatoResponse). */
 export interface CandidatoResponse {

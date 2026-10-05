@@ -40,7 +40,6 @@ export default defineConfig({
     plugins: [svgr(), react()],
 
     // Chamadas a /api/... vão para o backend sem o prefixo: /api/auth/login → http://localhost:8080/auth/login.
-    // Os mocks do MSW (/api/data/...) continuam sendo respondidos no navegador e não chegam aqui.
     server: {
         proxy: {
             '/api': {

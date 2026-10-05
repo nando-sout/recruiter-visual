@@ -9,17 +9,17 @@ const Error = () => {
         <div className="text-center">
           <img
             src={errorpage}
-            alt="error"
+            alt="Página não encontrada"
             className="mb-20"
             width={500}
             height={500}
           />
-          <h1 className="text-foreground text-4xl mb-6">Opps!!!</h1>
+          <h1 className="text-foreground text-4xl mb-6">Página não encontrada</h1>
           <h6 className="text-xl text-foreground">
-            This page you are looking for could not be found.
+            A página que você procura não existe ou foi movida.
           </h6>
           <Button className="mt-6 mx-auto">
-            <Link to="/">Go Back to Home</Link>
+            <Link to="/">Voltar para Minhas vagas</Link>
           </Button>
         </div>
       </div>

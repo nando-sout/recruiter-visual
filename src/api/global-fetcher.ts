@@ -51,10 +51,4 @@ const postFetcher = (url: string, arg: any) =>
 const putFetcher = (url: string, arg: any) =>
   request(url, jsonInit('PUT', arg), 'Failed to updated data');
 
-const patchFetcher = (url: string, arg: any) =>
-  request(url, jsonInit('PATCH', arg), 'Failed to updated data');
-
-const deleteFetcher = (url: string, arg: any) =>
-  request(url, jsonInit('DELETE', arg), 'Failed to delete data');
-
-export { getFetcher, postFetcher, putFetcher, deleteFetcher, patchFetcher };
+export { getFetcher, postFetcher, putFetcher };

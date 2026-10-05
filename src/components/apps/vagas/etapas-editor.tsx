@@ -1,5 +1,5 @@
 import { KeyboardEvent, useState } from "react";
-import { ArrowDown, ArrowUp, Flag, Plus, Trash2, TriangleAlert, Users } from "lucide-react";
+import { ArrowDown, ArrowUp, Flag, Plus, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -7,10 +7,8 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogMedia,
   AlertDialogTitle,
 } from "src/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "src/components/ui/alert";
 import { Badge } from "src/components/ui/badge";
 import { Button } from "src/components/ui/button";
 import { FieldDescription, FieldError } from "src/components/ui/field";
@@ -23,17 +21,13 @@ interface EtapasEditorProps {
   etapas: EtapaType[];
   onChange: (etapas: EtapaType[]) => void;
   error?: string;
-  showCandidates?: boolean;
   disabled?: boolean;
 }
-
-const candidatesLabel = (count: number) => `${count} ${count === 1 ? "candidato" : "candidatos"}`;
 
 const EtapasEditor = ({
   etapas,
   onChange,
   error,
-  showCandidates = false,
   disabled = false,
 }: EtapasEditorProps) => {
   const [newEtapaName, setNewEtapaName] = useState("");
@@ -120,12 +114,6 @@ const EtapasEditor = ({
                     Fechamento
                   </Badge>
                 )}
-                {showCandidates && (
-                  <span className="flex items-center gap-1 text-xs whitespace-nowrap text-muted-foreground">
-                    <Users className="size-3.5" />
-                    {candidatesLabel(etapa.candidatesCount)}
-                  </span>
-                )}
                 <Button
                   type="button"
                   variant="ghost"
@@ -204,56 +192,18 @@ const EtapasEditor = ({
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
-          {etapaToDelete && etapaToDelete.candidatesCount > 0 ? (
-            <>
-              <AlertDialogHeader>
-                <AlertDialogMedia className="bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                  <TriangleAlert />
-                </AlertDialogMedia>
-                <AlertDialogTitle>Existem candidatos nesta etapa</AlertDialogTitle>
-                <AlertDialogDescription>
-                  A etapa "{etapaToDelete.name}" possui{" "}
-                  {candidatesLabel(etapaToDelete.candidatesCount)}. Você quer movê-los para uma
-                  etapa anterior ou para uma etapa à frente?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <Alert>
-                <AlertDescription>
-                  A movimentação de candidatos ainda não está disponível. Por enquanto, etapas com
-                  candidatos não podem ser excluídas.
-                </AlertDescription>
-              </Alert>
-              <AlertDialogFooter className="sm:flex-col-reverse">
-                <AlertDialogCancel>Voltar</AlertDialogCancel>
-                <Button type="button" variant="outline" disabled>
-                  Mover para etapa anterior
-                </Button>
-                <Button type="button" variant="outline" disabled>
-                  Mover para etapa à frente
-                </Button>
-              </AlertDialogFooter>
-            </>
-          ) : (
-            <>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Excluir etapa?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  A etapa "{etapaToDelete?.name}" será removida da vaga e as demais serão
-                  renumeradas.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={confirmDelete}
-                >
-                  Excluir etapa
-                </Button>
-              </AlertDialogFooter>
-            </>
-          )}
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir etapa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              A etapa "{etapaToDelete?.name}" será removida da vaga e as demais serão renumeradas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <Button type="button" variant="destructive" onClick={confirmDelete}>
+              Excluir etapa
+            </Button>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
