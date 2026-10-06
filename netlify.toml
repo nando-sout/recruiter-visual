@@ -1,4 +1,10 @@
 [[redirects]]
+  from = "/api/*"
+  to = "https://recruiter-visual-api.onrender.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/"
   status = 200
