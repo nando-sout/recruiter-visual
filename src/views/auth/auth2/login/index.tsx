@@ -95,14 +95,23 @@ const BoxedLogin = () => {
                     disabled={submitting}
                   />
                 </div>
-                <div className="flex items-center space-x-3 text-sm">
-                  <Checkbox id="remember" className={"cursor-pointer"} />
-                  <Label
-                    htmlFor="remember"
-                    className="text-muted-foreground font-normal cursor-pointer leading-0"
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <div className="flex items-center space-x-3">
+                    <Checkbox id="remember" className={"cursor-pointer"} />
+                    <Label
+                      htmlFor="remember"
+                      className="text-muted-foreground font-normal cursor-pointer leading-0"
+                    >
+                      Lembrar dispositivo
+                    </Label>
+                  </div>
+                  <Link
+                    to="/auth/auth2/forgot-password"
+                    state={email.trim() ? { email: email.trim() } : undefined}
+                    className="font-medium text-primary hover:underline"
                   >
-                    Lembrar dispositivo
-                  </Label>
+                    Esqueci minha senha
+                  </Link>
                 </div>
               </div>
               <Button type="submit" size="lg" className="w-full rounded-lg" disabled={submitting}>
@@ -117,6 +126,17 @@ const BoxedLogin = () => {
                 className="font-medium text-primary hover:underline"
               >
                 Criar seu acesso
+              </Link>
+            </p>
+            <p className="text-center text-sm text-muted-foreground">
+              Não recebeu o código?{" "}
+              <Link
+                to="/auth/auth2/two-steps"
+                // Mesmo mecanismo do cadastro: o e-mail já digitado segue pelo state da navegação.
+                state={email.trim() ? { email: email.trim() } : undefined}
+                className="font-medium text-primary hover:underline"
+              >
+                Reenviar código
               </Link>
             </p>
           </Card>

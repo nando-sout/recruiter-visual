@@ -86,3 +86,23 @@ export interface VerifyEmailRequest {
 // ou { message, errors } (validação).
 export const verifyEmail = (data: VerifyEmailRequest): Promise<{ message: string }> =>
   postFetcher("/api/auth/verify-email", data);
+
+// POST /auth/resend-verification no backend: envia um novo código para quem ainda não confirmou o e-mail.
+// Rota pública: erros chegam como FetchError com status e corpo, como nas chamadas acima.
+export const resendVerification = (email: string): Promise<{ message: string }> =>
+  postFetcher("/api/auth/resend-verification", { email });
+
+// POST /auth/forgot-password no backend: envia um código de redefinição de senha para o e-mail.
+// Rota pública; a mensagem de resposta é neutra (não revela se o e-mail tem cadastro).
+export const forgotPassword = (email: string): Promise<{ message: string }> =>
+  postFetcher("/api/auth/forgot-password", { email });
+
+// POST /auth/reset-password no backend: troca a senha usando o código recebido por e-mail.
+// Rota pública: 400 chega como FetchError com { message } (código inválido/expirado)
+// ou { message, errors } (validação).
+export const resetPassword = (
+  email: string,
+  code: string,
+  newPassword: string,
+): Promise<{ message: string }> =>
+  postFetcher("/api/auth/reset-password", { email, code, newPassword });

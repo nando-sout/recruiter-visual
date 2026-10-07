@@ -24,6 +24,10 @@ const Register2 = Loadable(lazy(() => import('../views/auth/auth2/register')));
 
 const TwoSteps2 = Loadable(lazy(() => import('../views/auth/auth2/two-steps')));
 
+const ForgotPassword2 = Loadable(lazy(() => import('../views/auth/auth2/forgot-password')));
+
+const ResetPassword2 = Loadable(lazy(() => import('../views/auth/auth2/reset-password')));
+
 const Router = [
   {
     path: '/',
@@ -53,6 +57,10 @@ const Router = [
       { path: '/auth/auth2/register', element: <Register2 /> },
 
       { path: '/auth/auth2/two-steps', element: <TwoSteps2 /> },
+
+      { path: '/auth/auth2/forgot-password', element: <ForgotPassword2 /> },
+
+      { path: '/auth/auth2/reset-password', element: <ResetPassword2 /> },
       { path: '404', element: <Error /> },
       { path: '/auth/404', element: <Error /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
