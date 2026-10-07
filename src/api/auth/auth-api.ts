@@ -13,6 +13,9 @@ export interface LoginResponse {
 
 export class LoginError extends Error {}
 
+// 403 do login: a senha confere, mas o e-mail ainda não foi confirmado; a tela oferece o caminho para a verificação.
+export class EmailNotVerifiedError extends LoginError {}
+
 // Chama o backend direto, sem o global-fetcher: aqui um 401 é "senha errada",
 // não "sessão expirada", e deve virar mensagem na tela em vez de redirecionar.
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
@@ -29,6 +32,11 @@ export const login = async (email: string, password: string): Promise<LoginRespo
 
   if (res.status === 401) {
     throw new LoginError("E-mail ou senha inválidos.");
+  }
+  if (res.status === 403) {
+    throw new EmailNotVerifiedError(
+      "Seu e-mail ainda não foi verificado. Solicite um novo código para continuar.",
+    );
   }
   if (res.status === 400) {
     throw new LoginError("Informe um e-mail válido e a senha.");

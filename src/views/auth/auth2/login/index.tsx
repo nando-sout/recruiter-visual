@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { LoginError, login, startSession } from "@/api/auth/auth-api";
+import { EmailNotVerifiedError, LoginError, login, startSession } from "@/api/auth/auth-api";
 import { AuthShowcase, BrandMark } from "../auth-showcase";
 import { PasswordInput } from "../password-input";
 
@@ -16,11 +16,13 @@ const BoxedLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string>();
+  const [unverified, setUnverified] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(undefined);
+    setUnverified(false);
     setSubmitting(true);
     try {
       const response = await login(email.trim(), password);
@@ -30,6 +32,7 @@ const BoxedLogin = () => {
       navigate(from && from !== "/" ? from : "/apps/vagas", { replace: true });
     } catch (err) {
       setError(err instanceof LoginError ? err.message : "Não foi possível entrar agora. Tente novamente em instantes.");
+      setUnverified(err instanceof EmailNotVerifiedError);
       setSubmitting(false);
     }
   };
@@ -56,7 +59,21 @@ const BoxedLogin = () => {
             <form className="space-y-6 w-full" onSubmit={handleSubmit}>
               {error && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>
+                    {error}
+                    {unverified && (
+                      <>
+                        {" "}
+                        <Link
+                          to="/auth/auth2/two-steps"
+                          state={email.trim() ? { email: email.trim() } : undefined}
+                          className="font-medium"
+                        >
+                          Verificar meu e-mail
+                        </Link>
+                      </>
+                    )}
+                  </AlertDescription>
                 </Alert>
               )}
               <div className="space-y-4">
